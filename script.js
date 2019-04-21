@@ -1,3 +1,26 @@
+let overlay = document.querySelector('.overlay');
+let modal = document.querySelector('.modal');
+let speed = 0;
+
+modal.addEventListener('click', function(e){
+	if (e.target.classList.contains('easy')){
+		speed = 1000;
+	} else if (e.target.classList.contains('normal')){
+		speed = 500;
+	} else if (e.target.classList.contains('hard')){
+		speed = 200;
+	}
+
+	if(e.target.classList.contains('button')) {
+		modal.style.display = 'none';
+		overlay.style.display = 'none';
+		startGame();
+	}
+})
+
+function startGame() {
+
+
 let tetris = document.createElement('div');
 tetris.classList.add('tetris');
 
@@ -288,6 +311,10 @@ function create () {
 }
 create();
 
+let score = 0;
+let input = document.getElementsByTagName('input')[0];
+input.value = `Ваши очки: ${score}`;
+
 function move() {
 	let = moveFlag = true;
 	let = coordinates = [
@@ -322,13 +349,48 @@ function move() {
 			figureBody[i].classList.remove('figure');
 			figureBody[i].classList.add('set');
 		}
+		for (let i = 1; i < 15; i++){
+			let count = 0;
+			for (let k = 1; k < 11; k++){
+				if (document.querySelector(`[posX = "${k}"][posY = "${i}"]`).classList.contains('set')){
+					count++;
+					if (count == 10) {
+						score += 10;
+						input.value = `Ваши очки: ${score}`;
+						for (let m = 1; m < 11; m++){
+							document.querySelector(`[posX = "${m}"][posY = "${i}"]`).classList.remove('set')
+						}
+						let set = document.querySelectorAll('.set');
+						let newSet = [];
+						for (let s = 0; s < set.length; s++){
+							let setCoordinates = [set[s].getAttribute('posX'), set[s].getAttribute('posY')];
+							if (setCoordinates[1] > i) {
+								set[s].classList.remove('set');
+								newSet.push(document.querySelector(`[posX = "${setCoordinates[0]}"][posY = "${setCoordinates[1]-1}"]`));
+							}
+						}
+						for (let a = 0; a < newSet.length; a++) {
+							newSet[a].classList.add('set');
+						}
+						i--;
+					}
+				}
+			}
+		}
+		for (let n = 1; n < 11; n++) {
+			if (document.querySelector(`[posX = "${n}"][posY = "15"]`).classList.contains('set')) {
+				clearInterval(interval);
+				alert(`Игра окончена. Ваши очки: ${score}`);
+				break;
+			}
+		}
 		create();
 	}
 }
 
 let interval = setInterval (() => {
 	move();
-}, 300);
+}, speed);
 
 let flag = true;
 
@@ -404,3 +466,5 @@ window.addEventListener('keydown', function (e) {
 		}
 	}
 })
+
+}
